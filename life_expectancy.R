@@ -12,7 +12,9 @@ load_le <- function(){
      names(econ_data) <- col_names
      state_len <- nchar(econ_data$State.FIPS)	
      county_len <- nchar(econ_data$County.FIPS)
-     zeros <- c('0','00','000','0000')
-     econ_data$State.FIPS <- paste(econ_data$State.FIPS,zeros[5-state_len-county_len],sep='')
-     return(list(l=le,e=econ_data))
+     zeros <- c('','0','00','000')
+     econ_data$County.FIPS <- paste(zeros[4-county_len],econ_data$County.FIPS,sep='')
+     econ_data$fips <- paste(econ_data$State.FIPS,econ_data$County.FIPS,sep='')
+     total_frame <- merge(le,econ_data,by='fips')
+     return(total_frame)
  }
