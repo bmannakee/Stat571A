@@ -16,5 +16,6 @@ load_le <- function(){
      econ_data$County.FIPS <- paste(zeros[4-county_len],econ_data$County.FIPS,sep='')
      econ_data$fips <- paste(econ_data$State.FIPS,econ_data$County.FIPS,sep='')
      total_frame <- merge(le,econ_data,by='fips')
+     stopifnot(nchar(total_frame$fips)==5 || nchar(total_frame$fips)==4)
      return(total_frame)
  }
