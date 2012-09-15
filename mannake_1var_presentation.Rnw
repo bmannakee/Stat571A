@@ -1,0 +1,32 @@
+\documentclass{beamer}
+% This is the beamer file for presentations given in Stat571A Fall 2012
+% The project is to find predictors for Life Expectancy differences in counties
+% Data are from the US Census Bureau
+
+
+\title{Does Having a High Income Suggest You Will Live Longer?}
+\author{Brian Mannakee Gutenkunst Group - Molecular and Cellular Biology Statistics GIDP}
+\date{October 9, 2012}
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+
+
+
+\begin{frame}
+  \titlepage
+\end{frame}
+ 
+\begin{frame}
+<<echo=false,results=hide>>=
+library(xtable)
+source('life_expectancy.R')
+f <- load_le()
+@
+<<echo=FALSE,results=tex>>=
+print(xtable(summary(f)))
+@
+
+
+
+\end{frame}
+\end{document}
