@@ -5,10 +5,10 @@ load_le <- function(){
      # Econ datat in est09ALL.txt is fixed width	
      col_widths <- c(2,4,9,9,9,5,5,5,9,9,9,5,5,5,9,9,9,5,5,5,7,7,7,8,8,8,5,5,5,46,3,23)
      col_names <- c('State.FIPS','County.FIPS','all.ages.pov.percent.09','all.ages.pov.lower.09',
-                    'all.ages.pov.upper.09','median.household.income.est.09','income.lower.09','income.upper.09',
+                    'all.ages.pov.upper.09','income.09','income.lower.09','income.upper.09',
                     'county.name','postal.code','date.time')
      col_names_89 <- c('State.FIPS','County.FIPS','all.ages.pov.percent.89','all.ages.pov.lower.89',
-                    'all.ages.pov.upper.89','median.household.income.est.89','income.lower.89','income.upper.89')
+                    'all.ages.pov.upper.89','income.89','income.lower.89','income.upper.89')
      
      econ_data <- read.fwf('est09ALL.txt',col_widths,stringsAsFactors=FALSE)
      econ_data_89 <- read.fwf('est89all.txt',col_widths,stringsAsFactors=FALSE)
