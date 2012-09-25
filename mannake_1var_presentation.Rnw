@@ -2,14 +2,14 @@
 % This is the beamer file for presentations given in Stat571A Fall 2012
 % The project is to find predictors for Life Expectancy differences in counties
 % Data are from the US Census Bureau
+\setbeamertemplate{itemize items}[circle]
+\usepackage{graphicx}
 
-
-\title{Does Having a High Income Suggest You Will Live Longer?}
-\author{Brian Mannakee Gutenkunst Group - Molecular and Cellular Biology Statistics GIDP}
+\title{Does a High Income Mean You Will Live Longer?}
+\author{Brian Mannakee \\Gutenkunst Group - Molecular and Cellular Biology \\Statistics GIDP}
 \date{October 9, 2012}
 \begin{document}
 \SweaveOpts{concordance=TRUE}
-
 
 
 \begin{frame}
@@ -17,16 +17,57 @@
 \end{frame}
  
 \begin{frame}
+\frametitle{\textsc{What factors influence life expectancy?}}
 <<echo=false,results=hide>>=
 library(xtable)
 source('life_expectancy.R')
 f <- load_le()
 @
-<<echo=FALSE,results=tex>>=
-print(xtable(summary(f)))
+\begin{figure}[h]
+  \begin{center}
+<<fig=true,height=3,echo=FALSE>>=
+print(plot_historical_le())
 @
-
-
-
+  \end{center}
+\end{figure}
+\pause{}
+\begin{itemize}
+  \item Gender
+  \pause{}
+  \item Economic circumstances
+\end{itemize}
+\end{frame}
+\begin{frame}
+<<echo=FALSE,results=hide>>=
+f09 <- f[f['Year']==2009,]
+richest <- f09[f09['median.household.income.est.09']==max(f09['median.household.income.est.09']),][1,]
+poorest <- f09[f09['median.household.income.est.09']==min(f09['median.household.income.est.09']),][1,]
+@
+\frametitle{Economic Factors - Income}
+  Why should we study how incomes influence life expectancy?
+  \vfill
+  \pause{}
+  \begin{minipage}[b]{.47\textwidth}
+    \begin{center}
+      \small{The \emph{Richest} County In America}\\
+      \small{\Sexpr{richest['county.name']},\Sexpr{richest['postal.code']}}\\
+      \vfill
+    \end{center}
+      \small{Median Income:  \hfill \Sexpr{richest['median.household.income.est.09']}\;}\\\\
+      \small{Life Expectancy: \hfill \Sexpr{richest['Male']} M\;}
+      \begin{flushright}\small{\Sexpr{richest['Female']} F\;}\end{flushright}
+      \vfill
+  \end{minipage}
+  \vrule
+  \begin{minipage}[b]{.47\textwidth}
+       \begin{center}
+      \small{The \emph{Poorest} County In America}\\
+      \small{\Sexpr{poorest['county.name']},\Sexpr{poorest['postal.code']}}\\
+    \end{center}
+      \small{\hspace*{1 mm} Median Income:  \hfill \Sexpr{poorest['median.household.income.est.09']}}\\\\
+      \small{\hspace*{1 mm} Life Expectancy: \hfill \Sexpr{poorest['Male']} M}
+      \begin{flushright}\small{\Sexpr{poorest['Female']} F}\end{flushright}
+      \vfill
+  \end{minipage}
 \end{frame}
 \end{document}
