@@ -22,6 +22,10 @@
 library(xtable)
 source('life_expectancy.R')
 f <- load_le()
+f09 <- f[f['Year']==2009,]
+richest <- f09[f09['median.household.income.est.09']==max(f09['median.household.income.est.09']),][1,]
+poorest <- f09[f09['median.household.income.est.09']==min(f09['median.household.income.est.09']),][1,]
+male_09_reg <- get_regression(f09,'Male')
 @
 \begin{figure}[h]
   \begin{center}
@@ -38,11 +42,6 @@ print(plot_historical_le())
 \end{itemize}
 \end{frame}
 \begin{frame}
-<<echo=FALSE,results=hide>>=
-f09 <- f[f['Year']==2009,]
-richest <- f09[f09['median.household.income.est.09']==max(f09['median.household.income.est.09']),][1,]
-poorest <- f09[f09['median.household.income.est.09']==min(f09['median.household.income.est.09']),][1,]
-@
 \frametitle{Economic Factors - Income}
   Why should we study how incomes influence life expectancy?
   \vfill
@@ -70,4 +69,45 @@ poorest <- f09[f09['median.household.income.est.09']==min(f09['median.household.
       \vfill
   \end{minipage}
 \end{frame}
+\begin{frame}
+  \frametitle{Can We Use Income To Predict Life Expectancy?}
+  \begin{block}{A simple single variable linear model}
+    \begin{equation*}
+      (Average\,Life\,Expectancy) = \beta_1 + \beta_2(Median\,Income)
+    \end{equation*}
+  \end{block}
+  \begin{itemize}
+    \item{County level data}
+    \item{Separate models for male and female life expectancy}
+    \item{Median Estimated Income in 2009}
+    \item{All data from the US Census. www.census.gov}
+  \end{itemize}
+\end{frame}
+\begin{frame}
+  \frametitle{Linear Regression}
+  
+\end{frame}
 \end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

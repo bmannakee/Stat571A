@@ -52,3 +52,6 @@ plot_historical_le <- function(){
   return(p)
 }
 
+get_regression <- function(frame,sex){
+  return(sex)
+}
