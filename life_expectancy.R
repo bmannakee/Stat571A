@@ -32,7 +32,7 @@ load_le <- function(){
      econ_data[,3:8] <- sapply(econ_data[,3:8],as.numeric)
      econ_data_89[,1:5] <- sapply(econ_data_89[,1:5],as.numeric)
      econ_frame <- merge(econ_data,econ_data_89,by='fips')
-     econ_frame$Income.delta <- econ_frame$median.household.income.est.09 - econ_frame$median.household.income.est.89
+     econ_frame$Income.delta <- econ_frame$income.09 - econ_frame$income.89
      total_frame <- merge(le,econ_frame,by='fips')
      stopifnot(nchar(total_frame$fips)==5 || nchar(total_frame$fips)==4)
      return(total_frame)
@@ -52,6 +52,49 @@ plot_historical_le <- function(){
   return(p)
 }
 
-get_regression <- function(frame,sex){
-  return(sex)
+get_regression_09 <- function(frame,sex){
+  require(tseries) || install.packages('tseries')
+  library(tseries)
+  # First we get the regression coefficients and run tests for normality of the residuals
+  model <- lm(frame[,sex]~frame[,'income.09'])
+  results <- summary(model)$coef
+  intercept <- signif(results[1],2)
+  slope <- signif(results[2],3)
+  int_p <- ifelse(results[7]<.001,'0.000',signif(results[7],4))
+  slope_p <- ifelse(results[8] < .001,'0.000',signif(results[8],4))
+  r.squared <- signif(summary(model)$r.squared,2)
+  df <- summary(model)$df[2]
+  jb <- signif(jarque.bera.test(model$resid)$p.value,3)
+  # Now we create a plot of the regression. These will be bare bones.
+  library('ggplot2')
+  p <- ggplot(frame, aes_string(x='income.09',y=sex))
+  p <- p + geom_point(shape=1,colour='blue')
+  p <- p + geom_smooth(method=lm)
+  p <- p + theme_bw() + xlab('Median Income') + ylab('Life Expectancy')
+  vec <- list(intercept,int_p,slope,slope_p,r.squared,df,jb,p)
+  names(vec) <- c('int','int_p','slope','slope_p','r.squared','df','jb','plot')
+  return(vec)
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

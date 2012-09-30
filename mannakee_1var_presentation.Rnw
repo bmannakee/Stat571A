@@ -2,7 +2,10 @@
 % This is the beamer file for presentations given in Stat571A Fall 2012
 % The project is to find predictors for Life Expectancy differences in counties
 % Data are from the US Census Bureau
-\setbeamertemplate{itemize items}[circle]
+\usetheme{Pittsburgh}
+\usecolortheme{beaver}
+%\setbeamertemplate{itemize items}[circle]
+\setbeamertemplate{navigation symbols}{}%remove navigation symbols
 \usepackage{graphicx}
 
 \title{Does a High Income Mean You Will Live Longer?}
@@ -23,9 +26,10 @@ library(xtable)
 source('life_expectancy.R')
 f <- load_le()
 f09 <- f[f['Year']==2009,]
-richest <- f09[f09['median.household.income.est.09']==max(f09['median.household.income.est.09']),][1,]
-poorest <- f09[f09['median.household.income.est.09']==min(f09['median.household.income.est.09']),][1,]
-male_09_reg <- get_regression(f09,'Male')
+richest <- f09[f09['income.09']==max(f09['income.09']),][1,]
+poorest <- f09[f09['income.09']==min(f09['income.09']),][1,]
+male_reg_09 <- get_regression_09(f09,'Male')
+female_reg_09 <- get_regression_09(f09,'Female')
 @
 \begin{figure}[h]
   \begin{center}
@@ -34,10 +38,8 @@ print(plot_historical_le())
 @
   \end{center}
 \end{figure}
-\pause{}
 \begin{itemize}
   \item Gender
-  \pause{}
   \item Economic circumstances
 \end{itemize}
 \end{frame}
@@ -45,14 +47,13 @@ print(plot_historical_le())
 \frametitle{Economic Factors - Income}
   Why should we study how incomes influence life expectancy?
   \vfill
-  \pause{}
   \begin{minipage}[b]{.47\textwidth}
     \begin{center}
       \small{The \emph{Richest} County In America}\\
       \small{\Sexpr{richest['county.name']},\Sexpr{richest['postal.code']}}\\
       \vfill
     \end{center}
-      \small{Median Income:  \hfill \Sexpr{richest['median.household.income.est.09']}\;}\\\\
+      \small{Median Income:  \hfill \Sexpr{richest['income.09']}\;}\\\\
       \small{Life Expectancy: \hfill \Sexpr{richest['Male']} M\;}
       \begin{flushright}\small{\Sexpr{richest['Female']} F\;}\end{flushright}
       \vfill
@@ -63,7 +64,7 @@ print(plot_historical_le())
       \small{The \emph{Poorest} County In America}\\
       \small{\Sexpr{poorest['county.name']},\Sexpr{poorest['postal.code']}}\\
     \end{center}
-      \small{\hspace*{1 mm} Median Income:  \hfill \Sexpr{poorest['median.household.income.est.09']}}\\\\
+      \small{\hspace*{1 mm} Median Income:  \hfill \Sexpr{poorest['income.09']}}\\\\
       \small{\hspace*{1 mm} Life Expectancy: \hfill \Sexpr{poorest['Male']} M}
       \begin{flushright}\small{\Sexpr{poorest['Female']} F}\end{flushright}
       \vfill
@@ -85,9 +86,56 @@ print(plot_historical_le())
 \end{frame}
 \begin{frame}
   \frametitle{Linear Regression}
-  
+    \begin{columns}
+      \column{.45\textwidth}
+        \begin{block}{Female Model}
+          \centering
+          \begin{table}[h]\tiny
+            \begin{tabular}{|lc|}
+              \hline 
+              Intercept($\beta_1$) & \Sexpr{female_reg_09$int} \\
+                                   & (\Sexpr{female_reg_09$int_p}) \\
+                                   & \\
+              Slope($\beta_2$)     & \Sexpr{female_reg_09$slope} \\
+                                   & (\Sexpr{female_reg_09$slope_p}) \\
+                                   & \\
+              $r^2$                & \Sexpr{female_reg_09$r.squared} \\
+              Jarque Bera Test     & \Sexpr{female_reg_09$jb} \\
+              \hline
+            \end{tabular}
+          \end{table}
+        \centering
+<<fig=true,echo=FALSE>>=
+print(female_reg_09$plot)
+@
+        \end{block}      
+      \column{.08\textwidth}
+      \column{.45\textwidth}
+        \begin{block}{Male Model}
+        \centering
+          \begin{table}[h]\tiny
+            \begin{tabular}{|lc|}
+              \hline
+              Intercept($\beta_1$) & \Sexpr{male_reg_09$int} \\
+                                   & (\Sexpr{male_reg_09$int_p})  \\
+                                   & \\
+              Slope($\beta_2$)     & \Sexpr{male_reg_09$slope} \\
+                                   & (\Sexpr{male_reg_09$slope_p}) \\
+                                   & \\
+              $r^2$                & \Sexpr{male_reg_09$r.squared} \\
+              Jarque Bera Test     & \Sexpr{male_reg_09$jb} \\
+              \hline
+            \end{tabular}
+          \end{table}
+          \centering
+<<fig=true,echo=FALSE>>=
+print(male_reg_09$plot)
+@
+        \end{block}
+    \end{columns}
 \end{frame}
 \end{document}
+
 
 
 
