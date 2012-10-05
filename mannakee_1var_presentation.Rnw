@@ -7,7 +7,6 @@
 %\setbeamertemplate{itemize items}[circle]
 \setbeamertemplate{navigation symbols}{}%remove navigation symbols
 \usepackage{graphicx}
-
 \title{Does a High Income Mean You Will Live Longer?}
 \author{Brian Mannakee \\Gutenkunst Group - Molecular and Cellular Biology \\Statistics GIDP}
 \date{October 9, 2012}
@@ -30,6 +29,7 @@ richest <- f09[f09['income.09']==max(f09['income.09']),][1,]
 poorest <- f09[f09['income.09']==min(f09['income.09']),][1,]
 male_reg_09 <- get_regression_09(f09,'Male')
 female_reg_09 <- get_regression_09(f09,'Female')
+IO9 <- f09$income.09
 @
 \begin{figure}[h]
   \begin{center}
@@ -38,40 +38,61 @@ print(plot_historical_le())
 @
   \end{center}
 \end{figure}
-\begin{itemize}
-  \item Gender
-  \item Economic circumstances
-\end{itemize}
 \end{frame}
 \begin{frame}
 \frametitle{Economic Factors - Income}
   Why should we study how incomes influence life expectancy?
+  \begin{block}{}
+\scriptsize{\textit{This study finds a difference in both the level and the rate of change in mortality improvement over time by socioeconomic status for male Social Security covered workers.... In general, for birth cohorts spanning the years 1912-1941, the top half of the average relative earnings distribution has experienced faster mortality improvement than has the bottom half.\\ 
+\vspace{2 mm}\tiny\textbf{Trends in Mortality Differentials and Life Expectancy for Male Social Security Covered Workers, by Average Relative Earnings.\\ Hilary Waldron. ORES Working Paper No. 108. Social Security Administration 2007}}}
+  \end{block}
   \vfill
   \begin{minipage}[b]{.47\textwidth}
     \begin{center}
-      \small{The \emph{Richest} County In America}\\
-      \small{\Sexpr{richest['county.name']},\Sexpr{richest['postal.code']}}\\
-      \vfill
+      \scriptsize{The \emph{Richest} County In America}\\
+      \scriptsize{\Sexpr{richest['county.name']},\Sexpr{richest['postal.code']}}\\
     \end{center}
-      \small{Median Income:  \hfill \Sexpr{richest['income.09']}\;}\\\\
-      \small{Life Expectancy: \hfill \Sexpr{richest['Male']} M\;}
-      \begin{flushright}\small{\Sexpr{richest['Female']} F\;}\end{flushright}
+      \scriptsize{Median Income:  \hfill \Sexpr{richest['income.09']}\;}\\\\
+      \scriptsize{Life Expectancy: \hfill \Sexpr{richest['Male']} M\;}
+      \begin{flushright}\scriptsize{\Sexpr{richest['Female']} F\;}\end{flushright}
       \vfill
   \end{minipage}
   \vrule
   \begin{minipage}[b]{.47\textwidth}
        \begin{center}
-      \small{The \emph{Poorest} County In America}\\
-      \small{\Sexpr{poorest['county.name']},\Sexpr{poorest['postal.code']}}\\
+      \scriptsize{The \emph{Poorest} County In America}\\
+      \scriptsize{\Sexpr{poorest['county.name']},\Sexpr{poorest['postal.code']}}\\
     \end{center}
-      \small{\hspace*{1 mm} Median Income:  \hfill \Sexpr{poorest['income.09']}}\\\\
-      \small{\hspace*{1 mm} Life Expectancy: \hfill \Sexpr{poorest['Male']} M}
-      \begin{flushright}\small{\Sexpr{poorest['Female']} F}\end{flushright}
+      \scriptsize{\hspace*{1 mm} Median Income:  \hfill \Sexpr{poorest['income.09']}}\\\\
+      \scriptsize{\hspace*{1 mm} Life Expectancy: \hfill \Sexpr{poorest['Male']} M}
+      \begin{flushright}\scriptsize{\Sexpr{poorest['Female']} F}\end{flushright}
       \vfill
   \end{minipage}
 \end{frame}
 \begin{frame}
-  \frametitle{Can We Use Income To Predict Life Expectancy?}
+  \frametitle{Income and Life Expectancy Data}
+    \begin{table}[h]\scriptsize
+      \begin{tabular}{|l|c|c|c|}\hline
+        & \multicolumn{2}{c|}{Life Expectancy} & \\ \cline{2-3}
+        & Male & Female & Median Estimated Income \\ \hline
+      Min             & \Sexpr{min(f09$Male)} & \Sexpr{min(f09$Female)} & \Sexpr{min(f09$income.09)} \\
+      Max             & \Sexpr{max(f09$Male)} & \Sexpr{max(f09$Female)} & \Sexpr{max(f09$income.09)} \\
+      Mean            & \Sexpr{round(mean(f09$Male), 2)} & \Sexpr{round(mean(f09$Female), 2)} & \Sexpr{round(mean(f09$income.09))} \\
+      Median          & \Sexpr{round(median(f09$Male), 2)} & \Sexpr{round(median(f09$Female), 2)} & \Sexpr{round(median(f09$income.09))} \\
+      Standard Dev.   & \Sexpr{round(sd(f09$Male), 2)} & \Sexpr{round(sd(f09$Female), 2)} & \Sexpr{round(sd(f09$income.09))} \\ \hline
+      \end{tabular}
+    \end{table}
+    \begin{center}
+<<fig=true,echo=FALSE,height=3>>=
+par(mfrow=c(1,3))
+hist(f09$Male,breaks=30,main='Male Life Expectancy')
+hist(f09$Female,breaks=30,main='Female Life Expectancy')
+hist(f09$income.09,breaks=30,main='Median Income')
+@
+    \end{center}
+\end{frame}
+\begin{frame}
+  \frametitle{A Linear Model}
   \begin{block}{A simple single variable linear model}
     \begin{equation*}
       (Average\,Life\,Expectancy) = \beta_1 + \beta_2(Median\,Income)
