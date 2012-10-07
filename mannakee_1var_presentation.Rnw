@@ -7,7 +7,7 @@
 %\setbeamertemplate{itemize items}[circle]
 \setbeamertemplate{navigation symbols}{}%remove navigation symbols
 \usepackage{graphicx}
-\title{Does a High Income Mean You Will Live Longer?}
+\title{Linear Regression Model for Income and Life Expectancy}
 \author{Brian Mannakee \\Gutenkunst Group - Molecular and Cellular Biology \\Statistics GIDP}
 \date{October 9, 2012}
 \begin{document}
@@ -29,6 +29,8 @@ richest <- f09[f09['income.09']==max(f09['income.09']),][1,]
 poorest <- f09[f09['income.09']==min(f09['income.09']),][1,]
 male_reg_09 <- get_regression_09(f09,'Male')
 female_reg_09 <- get_regression_09(f09,'Female')
+male_reg_09_log <- get_regression_09_log(f09,'Male')
+female_reg_09_log <- get_regression_09_log(f09,'Female')
 IO9 <- f09$income.09
 @
 \begin{figure}[h]
@@ -43,7 +45,7 @@ print(plot_historical_le())
 \frametitle{Economic Factors - Income}
   Why should we study how incomes influence life expectancy?
   \begin{block}{}
-\scriptsize{\textit{This study finds a difference in both the level and the rate of change in mortality improvement over time by socioeconomic status for male Social Security covered workers.... In general, for birth cohorts spanning the years 1912-1941, the top half of the average relative earnings distribution has experienced faster mortality improvement than has the bottom half.\\ 
+\scriptsize{\textit{"This study finds a difference in both the level and the rate of change in mortality improvement over time by socioeconomic status for male Social Security covered workers.... In general, for birth cohorts spanning the years 1912-1941, the top half of the average relative earnings distribution has experienced faster mortality improvement than has the bottom half."\\ 
 \vspace{2 mm}\tiny\textbf{Trends in Mortality Differentials and Life Expectancy for Male Social Security Covered Workers, by Average Relative Earnings.\\ Hilary Waldron. ORES Working Paper No. 108. Social Security Administration 2007}}}
   \end{block}
   \vfill
@@ -84,73 +86,82 @@ print(plot_historical_le())
     \end{table}
     \begin{center}
 <<fig=true,echo=FALSE,height=3>>=
-par(mfrow=c(1,3))
+par(mfrow=c(1,3),oma=c(0,0,2,0))
 hist(f09$Male,breaks=30,main='Male Life Expectancy')
 hist(f09$Female,breaks=30,main='Female Life Expectancy')
 hist(f09$income.09,breaks=30,main='Median Income')
+title('Histograms of regression variables. N=3133',outer=TRUE)
 @
     \end{center}
 \end{frame}
 \begin{frame}
   \frametitle{A Linear Model}
-  \begin{block}{A simple single variable linear model}
+  \begin{block}{Two simple single variable linear models}
     \begin{equation*}
-      (Average\,Life\,Expectancy) = \beta_1 + \beta_2(Median\,Income)
+      (Average\,Life\,Expectancy) = \beta_1 + \beta_2*(Median\,Income)
+    \end{equation*}
+    \begin{equation*}
+      Log(Average\,Life\,Expectancy) = \beta_1 + \beta_2*Log(Median\,Income)
     \end{equation*}
   \end{block}
   \begin{itemize}
-    \item{County level data}
+    \item{County level US census data from www.census.gov}
     \item{Separate models for male and female life expectancy}
     \item{Median Estimated Income in 2009}
-    \item{All data from the US Census. www.census.gov}
   \end{itemize}
 \end{frame}
 \begin{frame}
-  \frametitle{Linear Regression}
+  \frametitle{OLS Linear Regression}
     \begin{columns}
-      \column{.45\textwidth}
+      \column{.49\textwidth}
         \begin{block}{Female Model}
           \centering
           \begin{table}[h]\tiny
-            \begin{tabular}{|lc|}
-              \hline 
-              Intercept($\beta_1$) & \Sexpr{female_reg_09$int} \\
-                                   & (\Sexpr{female_reg_09$int_p}) \\
-                                   & \\
-              Slope($\beta_2$)     & \Sexpr{female_reg_09$slope} \\
-                                   & (\Sexpr{female_reg_09$slope_p}) \\
-                                   & \\
-              $r^2$                & \Sexpr{female_reg_09$r.squared} \\
-              Jarque Bera Test     & \Sexpr{female_reg_09$jb} \\
+            \begin{tabular}{|lcc|}            
+              \multicolumn{1}{l}{} &\multicolumn{1}{c}{Lin-Lin}       & \multicolumn{1}{c}{Log-Log} \\
+              \hline
+              Intercept($\beta_1$) & \Sexpr{female_reg_09$int}        & \Sexpr{female_reg_09_log$int}\\
+                                   & (\Sexpr{female_reg_09$int_p})    & (\Sexpr{female_reg_09_log$int_p})\\
+                                   &                                  & \\
+              Slope($\beta_2$)     & \Sexpr{female_reg_09$slope}      & \Sexpr{female_reg_09_log$slope}\\
+                                   & (\Sexpr{female_reg_09$slope_p})  & (\Sexpr{female_reg_09_log$slope_p})\\
+                                   &                                  & \\
+              $r^2$                & \Sexpr{female_reg_09$r.squared}  & \Sexpr{female_reg_09_log$r.squared}\\
+                                   &                                  & \\
+              $df$                 & \Sexpr{female_reg_09$df}         & \Sexpr{female_reg_09_log$df}\\
+              Jarque Bera Test     & \Sexpr{female_reg_09$jb}         & \Sexpr{female_reg_09_log$jb}\\
               \hline
             \end{tabular}
           \end{table}
         \centering
-<<fig=true,echo=FALSE>>=
-print(female_reg_09$plot)
+<<fig=true,echo=FALSE,width=9>>=
+print(female_reg_09_log$plot)
 @
         \end{block}      
-      \column{.08\textwidth}
-      \column{.45\textwidth}
+      \column{.02\textwidth}
+      \column{.49\textwidth}
         \begin{block}{Male Model}
         \centering
           \begin{table}[h]\tiny
-            \begin{tabular}{|lc|}
+            \begin{tabular}{|lcc|}     
+              \multicolumn{1}{l}{} &\multicolumn{1}{c}{Lin-Lin}     & \multicolumn{1}{c}{Log-Log} \\
               \hline
-              Intercept($\beta_1$) & \Sexpr{male_reg_09$int} \\
-                                   & (\Sexpr{male_reg_09$int_p})  \\
-                                   & \\
-              Slope($\beta_2$)     & \Sexpr{male_reg_09$slope} \\
-                                   & (\Sexpr{male_reg_09$slope_p}) \\
-                                   & \\
-              $r^2$                & \Sexpr{male_reg_09$r.squared} \\
-              Jarque Bera Test     & \Sexpr{male_reg_09$jb} \\
+              Intercept($\beta_1$) & \Sexpr{male_reg_09$int}        & \Sexpr{male_reg_09_log$int}\\
+                                   & (\Sexpr{male_reg_09$int_p})    & (\Sexpr{male_reg_09_log$int_p})\\
+                                   &                                & \\
+              Slope($\beta_2$)     & \Sexpr{male_reg_09$slope}      & \Sexpr{male_reg_09_log$slope} \\
+                                   & (\Sexpr{male_reg_09$slope_p})  & (\Sexpr{male_reg_09_log$slope_p}) \\
+                                   &                                & \\
+              $r^2$                & \Sexpr{male_reg_09$r.squared}  & \Sexpr{male_reg_09_log$r.squared} \\
+                                   &                                & \\
+              $df$                 & \Sexpr{male_reg_09$df}         & \Sexpr{male_reg_09_log$df}\\
+              Jarque Bera Test     & \Sexpr{male_reg_09$jb}         & \Sexpr{male_reg_09_log$jb} \\
               \hline
             \end{tabular}
           \end{table}
           \centering
-<<fig=true,echo=FALSE>>=
-print(male_reg_09$plot)
+<<fig=true,echo=FALSE,width=9>>=
+print(male_reg_09_log$plot)
 @
         \end{block}
     \end{columns}

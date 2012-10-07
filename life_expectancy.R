@@ -68,16 +68,39 @@ get_regression_09 <- function(frame,sex){
   # Now we create a plot of the regression. These will be bare bones.
   library('ggplot2')
   p <- ggplot(frame, aes_string(x='income.09',y=sex))
-  p <- p + geom_point(shape=1,colour='blue')
+  p <- p + geom_point(shape=1)
   p <- p + geom_smooth(method=lm)
   p <- p + theme_bw() + xlab('Median Income') + ylab('Life Expectancy')
-  vec <- list(intercept,int_p,slope,slope_p,r.squared,df,jb,p)
-  names(vec) <- c('int','int_p','slope','slope_p','r.squared','df','jb','plot')
+  vec <- list(intercept,int_p,slope,slope_p,r.squared,df,jb,p,model$residuals)
+  names(vec) <- c('int','int_p','slope','slope_p','r.squared','df','jb','plot','residuals')
   return(vec)
 }
 
 
-
+get_regression_09_log <- function(frame,sex){
+  require(tseries) || install.packages('tseries')
+  library(tseries)
+  # First we get the regression coefficients and run tests for normality of the residuals
+  model <- lm(log(frame[,sex])~log(frame[,'income.09']))
+  results <- summary(model)$coef
+  intercept <- signif(results[1],2)
+  slope <- signif(results[2],3)
+  int_p <- ifelse(results[7]<.001,'0.000',signif(results[7],4))
+  slope_p <- ifelse(results[8] < .001,'0.000',signif(results[8],4))
+  r.squared <- signif(summary(model)$r.squared,2)
+  df <- summary(model)$df[2]
+  jb <- signif(jarque.bera.test(model$resid)$p.value,3)
+  # Now we create a plot of the regression. These will be bare bones.
+  library('ggplot2')
+  p <- ggplot(frame, aes_string(x='income.09',y=sex))
+  p <- p + geom_point(shape=1)
+  p <- p + geom_smooth(method=lm)
+  p <- p + scale_x_log10(breaks=c(2e4,5e4,1e5)) + scale_y_log10(breaks=c(70,75,80,85))
+  p <- p + theme_bw() + xlab('Log Median Income') + ylab('Log Life Expectancy')
+  vec <- list(intercept,int_p,slope,slope_p,r.squared,df,jb,p,model$residuals)
+  names(vec) <- c('int','int_p','slope','slope_p','r.squared','df','jb','plot','residuals')
+  return(vec)
+}
 
 
 
