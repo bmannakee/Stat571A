@@ -15,9 +15,9 @@
 \allsectionsfont{\sffamily\mdseries\upshape} % (See the fntguide.pdf for font help)
 % (This matches ConTeXt defaults)
 
-\title{\textsc{Does a high income mean you will live longer?}}
+\title{\textsc{Linear Regression Analysis of the Relationship Between Life Expectancy and Income in the United States}}
 \author{Brian Mannakee}
-\date{Draft prepared \today} % Activate to display a given date or no date (if empty),
+\date{\today} % Activate to display a given date or no date (if empty),
          % otherwise the current date is printed 
 \begin{document}
 \SweaveOpts{concordance=TRUE}
@@ -46,9 +46,9 @@ print(plot_historical_le())
 \caption{Life expectancy in the United States has risen steadily since 1900}
 \label{fig1}
 \end{figure}
-Further muddying the waters, in a working paper published in 2007\cite{ssareport} the U.S. Social Security Administration found that for the Social Security-eligible cohort born between 1912 and 1941 the top half of the earnings distribution has experienced faster increases in life expectancy than their peers in the lower half. In fact, while those in the upper half of the income distribution born in 1912 could expect to live 1.2 years longer than their counterparts in the lower half, by the time you get to those born in 1941 that discrepancy widens to 5.8 years. So, while it is obvious that the effect of income on life expectancy is complex, it is also obvious that it is important; nearly 6 years of additional life expectancy from a higher income is alot, and raises important questions around social justice and equity for our society, particularly as income disparities widen. Here I will use U.S Census data to develop a simple Linear Regression Model to investigate the relation between Life Expectancy and Income at the county level.
+Further muddying the waters, in a working paper published in 2007\cite{ssareport} the U.S. Social Security Administration found that for the Social Security-eligible cohort born between 1912 and 1941 the top half of the earnings distribution has experienced faster increases in life expectancy than their peers in the lower half. In fact, while those in the upper half of the income distribution born in 1912 could expect to live 1.2 years longer than their counterparts in the lower half, by the time you get to those born in 1941 that discrepancy widens to 5.8 years. So, while it is obvious that the effect of income on life expectancy is complex, it is also obvious that it is important; nearly 6 years of additional life expectancy from a higher income is a substantial increase, and raises important questions around social justice and equity for our society, particularly as income disparities widen. Here I will use U.S Census data to develop a simple linear regression model to investigate the relation between life expectancy and income at the county level.
 \section*{Data}
-All data used in this analysis were downloaded from www.census.gov on \date{September 2, 2012}. Life expectancy comes from the IHME County Life Expectancy 1987-2009 data and median estimated income comes from the Small Area Income and Poverty Estimates(SAIPE) data. In this analysis I will focus on life expectancy and income at 2009, and Males and Females will be modeled separately as Figure~\ref{fig1} shows they seem to be subject to slightly different forces. The structure of the data can be seen in Table~\ref{datasummary} and Figure~\ref{hist}. We can see that the life expectancy data are pretty narrowly dispersed and normal in character. The median income data is widely dispersed over nearly an order of magnitude and are quite right skewed. The variation in income will reduce the variance in our prediction of life expectancy, but the skew to the right may be problematic.
+All data used in this analysis were downloaded from www.census.gov on \date{September 2, 2012}. Life expectancy comes from the IHME County Life Expectancy 1987-2009 data and median estimated income comes from the Small Area Income and Poverty Estimates(SAIPE) data. In this analysis I will focus on life expectancy and income at 2009, and males and females will be modeled separately as Figure~\ref{fig1} shows they seem to be subject to slightly different forces. The structure of the data can be seen in Table~\ref{datasummary} and Figure~\ref{hist}. We can see that the life expectancy data are pretty narrowly dispersed and normal in character, while the median income data is widely dispersed over nearly an order of magnitude and are quite right skewed. The variation in income will reduce the variance in our prediction of life expectancy, but the skew to the right may be problematic.
 \begin{table}[h]
       \centering
       \begin{tabular}{lccc}\hline
@@ -60,7 +60,7 @@ All data used in this analysis were downloaded from www.census.gov on \date{Sept
       Median          & \Sexpr{round(median(f09$Male), 2)} & \Sexpr{round(median(f09$Female), 1)} & \Sexpr{prettyNum(round(median(f09$income.09)),big.mark=",")} \\
       Standard Dev.   & \Sexpr{round(sd(f09$Male), 1)} & \Sexpr{round(sd(f09$Female), 1)} & \Sexpr{prettyNum(round(sd(f09$income.09)),big.mark=",")} \\ \hline
       \end{tabular}
-      \caption{Summary of economic and life expectancy data used in linear regression. N=3133}
+      \caption{Summary of economic and life expectancy data used in linear regression. N=3131}
       \label{datasummary}
     \end{table}
 \begin{figure}[h]
@@ -91,7 +91,7 @@ I will try two different regression models, a Lin-Lin model and a Log-Log model.
                                     & Male                      & Female          & Male      & Female \\
               \hline
               Intercept($\beta_1$) & \Sexpr{female_reg_09$int}    & \Sexpr{male_reg_09$int}    & \Sexpr{female_reg_09_log$int} & \Sexpr{male_reg_09_log$int}\\
-                                   & (\Sexpr{female_reg_09$int_p}) & (\Sexpr{male_reg_09$int_p})   & (\Sexpr{female_reg_09_log$int_p}) & (\Sexpr{male_reg_09_log$int_p}\\
+                                   & (\Sexpr{female_reg_09$int_p}) & (\Sexpr{male_reg_09$int_p})   & (\Sexpr{female_reg_09_log$int_p}) & (\Sexpr{male_reg_09_log$int_p})\\
                                    &                                  &                           &                                     &\\
               Slope($\beta_2$)     & \Sexpr{female_reg_09$slope}  & \Sexpr{male_reg_09$slope}    & \Sexpr{female_reg_09_log$slope} & \Sexpr{male_reg_09_log$slope}\\
                                    & (\Sexpr{female_reg_09$slope_p}) & (\Sexpr{male_reg_09$slope_p}) & (\Sexpr{female_reg_09_log$slope_p}) & (\Sexpr{male_reg_09_log$slope_p})\\
@@ -107,7 +107,7 @@ I will try two different regression models, a Lin-Lin model and a Log-Log model.
         \label{regressiontable}
 \end{table}
 
-The results of these regression analyses are shown in Table~\ref{regressiontable}. Both models explain considerable amounts of the variance in life expectancy, and all parameters are significant, so there is no obvious reason to choose one over the other. Plotting the data and regression lines for each model as in Figure~\ref{regressionplots} gives a better idea of what is going on. The Log-Log regression seems to better capture the relationship between life expectancy and income at the extremes of the income distribution. This makes sense, as theory and intuition would suggest that a doubling of income should have about the same effect on life expectancy regardless of level of income. Or conversely, a twenty thousand dollar increase in income should have a much larger effect from a starting point of eighteen thousand dollars in income than from a starting point of one hundred thousand dollars. 
+The results of these regression analyses are shown in Table~\ref{regressiontable}. Both models explain considerable amounts of the variance in life expectancy, and all parameters are significant. Since the models have different functional forms for the dependent variable the $r^2$ values can not be directly compared, so there is no obvious reason to choose one over the other. Plotting the data and regression lines for each model as in Figure~\ref{regressionplots} gives a better idea of what is going on. The Log-Log regression seems to better capture the relationship between life expectancy and income at the extremes of the income distribution. This makes sense, as theory and intuition would suggest that a doubling of income should have about the same effect on life expectancy regardless of level of income. Or conversely, a twenty thousand dollar increase in income should have a much larger effect from a starting point of eighteen thousand dollars in income than from a starting point of one hundred thousand dollars. 
 
 Taking the tabular and graphical results of the regression together with the theory behind the model, I conclude that a Log-Log model is a better way to look at the relationship between life expectancy and income than a Lin-Lin model. One issue is that the residuals of both models fail the Jarque-Bera test for normality. The histogram in Figure~\ref{residualhist} shows the residuals for both the Lin-Lin and Log-Log models. The departure from normality is not obvious from the plots, but is not unexpected, as county level data is spatially auto-correlated in that rich counties tend to cluster together and poor counties do as well.
 
@@ -115,9 +115,9 @@ Taking the tabular and graphical results of the regression together with the the
 \begin{center}
 <<fig=true,echo=FALSE,width=8,height=4>>=
 library(gridExtra)
-print(grid.arrange(male_reg_09$plot,male_reg_09_log$plot,ncol=2,widths=c(3,3),main='Lin-Lin and Log-Log plots for Male life expectancy vs. income'))
+grid.arrange(male_reg_09$plot,male_reg_09_log$plot,ncol=2,widths=c(3,3),main='Lin-Lin and Log-Log plots for Male life expectancy vs. income')
 @
-\caption{Comparison of linear regression plots between Lin-Lin and Log-Log models. The Log-Log model captures the behavior at the extreme ends of the distribution better than the Lin-Lin model. Female data is omitted for space but looks substantially the same}
+\caption{Comparison of linear regression plots between Lin-Lin and Log-Log models. The Log-Log model captures the behavior at the extreme ends of the distribution better than the Lin-Lin model. Female data is omitted for space but looks substantially the same.}
 \label{regressionplots}
 \end{center}
 \end{figure}
@@ -129,7 +129,7 @@ hist(male_reg_09$residuals,breaks=30,main='Lin-Lin',xlab='',ylab='')
 hist(male_reg_09_log$residuals,breaks=30,main='Log-Log',xlab='',ylab='')
 title('Histograms of residuals',outer=TRUE)
 @
-\caption{Histogram plots of residuals for the Lin-Lin and Log-Log models. Female data is omitted for space, but looks substantially the same}
+\caption{Histogram plots of residuals for the Lin-Lin and Log-Log models. Female data is omitted for space but looks substantially the same.}
 \label{residualhist}
 \end{center}
 \end{figure}

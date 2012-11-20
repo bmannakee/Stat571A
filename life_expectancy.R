@@ -34,10 +34,20 @@ load_le <- function(){
      econ_frame <- merge(econ_data,econ_data_89,by='fips')
      econ_frame$Income.delta <- econ_frame$income.09 - econ_frame$income.89
      total_frame <- merge(le,econ_frame,by='fips')
+     total_frame <- merge(total_frame,load_geo(),by='fips')
      stopifnot(nchar(total_frame$fips)==5 || nchar(total_frame$fips)==4)
      return(total_frame)
  }
 
+load_geo <- function(){
+  geo <- read.csv('county_geocode.csv')
+  names(geo) <- c('State.FIPS','County.FIPS','County','State','Pop','Lat','Long')
+  county_len <- nchar(geo$County.FIPS)
+  zeros <- c('','0','00','000')
+  geo$County.FIPS <- paste(zeros[4-county_len],geo$County.FIPS,sep='')
+  geo$fips <- paste(geo$State.FIPS,geo$County.FIPS,sep='')
+  return(geo)
+}
 plot_historical_le <- function(){
   years <- seq(from=1900,to=2010,by=5)
   male_le <- c(46.3,47.3,48.4,52.5,53.6,57.6,58.1,59.9,60.8,63.6,65.6,66.7,66.6,66.8,67.1,68.8,70.0,71.1,71.8,72.5,74.3,75.2,76.2)

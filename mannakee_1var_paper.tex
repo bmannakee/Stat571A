@@ -1,6 +1,8 @@
 \documentclass[12pt]{article}
 \usepackage[utf8]{inputenc} % set input encoding (not needed with XeLaTeX)
 \usepackage{wrapfig}
+\usepackage{amsmath}
+\usepackage[margin=1in]{geometry}
 % \usepackage[parfill]{parskip} % Activate to begin paragraphs with an empty line rather than an indent
 %%% HEADERS & FOOTERS
 \usepackage{fancyhdr} % This should be set AFTER setting up the page geometry
@@ -13,9 +15,9 @@
 \allsectionsfont{\sffamily\mdseries\upshape} % (See the fntguide.pdf for font help)
 % (This matches ConTeXt defaults)
 
-\title{\textsc{Does a high income mean you will live longer?}}
+\title{\textsc{Linear Regression Analysis of the Relationship Between Life Expectancy and Income in the United States}}
 \author{Brian Mannakee}
-\date{Draft prepared \today} % Activate to display a given date or no date (if empty),
+\date{\today} % Activate to display a given date or no date (if empty),
          % otherwise the current date is printed 
 \usepackage{Sweave}
 \begin{document}
@@ -24,21 +26,95 @@
 
 \newpage
 \section*{Introduction}
-Average life expectancy has increased dramatically in the United States since the beginning of the 20th century.
+Average life expectancy has increased dramatically in the United States since the beginning of the 20th century, but the increase has not been uniform. We can see in Figure ~\ref{fig1} that on average women gained more years of life expectancy than men. Figure~\ref{fig1} also suggests another factor that might contribute to differences in life expectancy, as the dramatic dip in the life expectancy of women around 1920 appears to be a signal of the Great Depression picked up in the data. However, recent work by Tapia et. al.\cite{Tapia} and others shows that life expectancy actually \emph{increased} during the years of the Great Depression, and in fact has increased during all periods of economic downturn and decreased during periods of strong economic growth. This rather perverse negative relationship between income growth and life expectancy is counter-intuitive; however work by Ruhm makes a strong case that this relationship is expected because rising incomes make negative lifestyle choices like smoking and obesity more affordable\cite{Ruhm}. 
 \begin{figure}[h]
 \begin{center}
 \includegraphics{mannakee_1var_paper-002}
 \end{center}
+\caption{Life expectancy in the United States has risen steadily since 1900}
+\label{fig1}
 \end{figure}
+Further muddying the waters, in a working paper published in 2007\cite{ssareport} the U.S. Social Security Administration found that for the Social Security-eligible cohort born between 1912 and 1941 the top half of the earnings distribution has experienced faster increases in life expectancy than their peers in the lower half. In fact, while those in the upper half of the income distribution born in 1912 could expect to live 1.2 years longer than their counterparts in the lower half, by the time you get to those born in 1941 that discrepancy widens to 5.8 years. So, while it is obvious that the effect of income on life expectancy is complex, it is also obvious that it is important; nearly 6 years of additional life expectancy from a higher income is a substantial increase, and raises important questions around social justice and equity for our society, particularly as income disparities widen. Here I will use U.S Census data to develop a simple linear regression model to investigate the relation between life expectancy and income at the county level.
+\section*{Data}
+All data used in this analysis were downloaded from www.census.gov on \date{September 2, 2012}. Life expectancy comes from the IHME County Life Expectancy 1987-2009 data and median estimated income comes from the Small Area Income and Poverty Estimates(SAIPE) data. In this analysis I will focus on life expectancy and income at 2009, and males and females will be modeled separately as Figure~\ref{fig1} shows they seem to be subject to slightly different forces. The structure of the data can be seen in Table~\ref{datasummary} and Figure~\ref{hist}. We can see that the life expectancy data are pretty narrowly dispersed and normal in character, while the median income data is widely dispersed over nearly an order of magnitude and are quite right skewed. The variation in income will reduce the variance in our prediction of life expectancy, but the skew to the right may be problematic.
+\begin{table}[h]
+      \centering
+      \begin{tabular}{lccc}\hline
+        & \multicolumn{2}{c}{Life Expectancy} & Median Estimated Income\\ 
+        & Male & Female & (Dollars) \\ \hline\hline
+      Min             & 66.1 & 74.1 & 18,860 \\
+      Max             & 81.6 & 85.8 & 114,200 \\
+      Mean            & 74.46 & 79.9 & 42,920 \\
+      Median          & 74.8 & 80.1 & 41,027 \\
+      Standard Dev.   & 2.4 & 1.7 & 11,166 \\ \hline
+      \end{tabular}
+      \caption{Summary of economic and life expectancy data used in linear regression. N=3131}
+      \label{datasummary}
+    \end{table}
+\begin{figure}[h]
+      \begin{center}
+\includegraphics{mannakee_1var_paper-003}
+      \end{center}
+      \caption{Histograms of male and female life expectancy, as well as median income.}
+      \label{hist}
+\end{figure}
+\newpage
+\section*{Regression}
+I will try two different regression models, a Lin-Lin model and a Log-Log model.
+\begin{equation*}
+      (Average\,Life\,Expectancy) = \beta_1 + \beta_2*(Median\,Income)
+\end{equation*}
+\begin{equation*}
+      Log(Average\,Life\,Expectancy) = \beta_1 + \beta_2*Log(Median\,Income)
+\end{equation*}
+\begin{table}[h]
+          \centering
+            \begin{tabular}{lcccc}            
+              \multicolumn{1}{l}{} &\multicolumn{2}{c}{Lin-Lin}       & \multicolumn{2}{c}{Log-Log} \\\hline\hline
+                                    & Male                      & Female          & Male      & Female \\
+              \hline
+              Intercept($\beta_1$) & 76    & 68    & 3.8 & 3.3\\
+                                   & (0.000) & (0.000)   & (0.000) & (0.000)\\
+                                   &                                  &                           &                                     &\\
+              Slope($\beta_2$)     & 9.06e-05  & 0.000142    & 0.0561 & 0.0936\\
+                                   & (0.000) & (0.000) & (0.000) & (0.000)\\
+                                   &                                  &                               &                                     & \\
+              $r^2$                & 0.34 & 0.44 & 0.38 & 0.48\\
+                                   &                                  &                               &                                     & \\
+              $df$                 & 3131   & 3131      & 3131 & 3131\\
+              Jarque Bera Test     & 2.84e-06    & 1.25e-07     & 0.00148 & 0.00576\\
+              \hline
+            \end{tabular}
+        \centering
+        \caption{Results of OLS linear regression analysis for two different types of model.}
+        \label{regressiontable}
+\end{table}
 
-Hypothesis
+The results of these regression analyses are shown in Table~\ref{regressiontable}. Both models explain considerable amounts of the variance in life expectancy, and all parameters are significant. Since the models have different functional forms for the dependent variable the $r^2$ values can not be directly compared, so there is no obvious reason to choose one over the other. Plotting the data and regression lines for each model as in Figure~\ref{regressionplots} gives a better idea of what is going on. The Log-Log regression seems to better capture the relationship between life expectancy and income at the extremes of the income distribution. This makes sense, as theory and intuition would suggest that a doubling of income should have about the same effect on life expectancy regardless of level of income. Or conversely, a twenty thousand dollar increase in income should have a much larger effect from a starting point of eighteen thousand dollars in income than from a starting point of one hundred thousand dollars. 
 
-Regression equation
+Taking the tabular and graphical results of the regression together with the theory behind the model, I conclude that a Log-Log model is a better way to look at the relationship between life expectancy and income than a Lin-Lin model. One issue is that the residuals of both models fail the Jarque-Bera test for normality. The histogram in Figure~\ref{residualhist} shows the residuals for both the Lin-Lin and Log-Log models. The departure from normality is not obvious from the plots, but is not unexpected, as county level data is spatially auto-correlated in that rich counties tend to cluster together and poor counties do as well.
 
-Results
+\begin{figure}[h]
+\begin{center}
+\includegraphics{mannakee_1var_paper-004}
+\caption{Comparison of linear regression plots between Lin-Lin and Log-Log models. The Log-Log model captures the behavior at the extreme ends of the distribution better than the Lin-Lin model. Female data is omitted for space but looks substantially the same.}
+\label{regressionplots}
+\end{center}
+\end{figure}
+\begin{figure}
+\begin{center}
+\includegraphics{mannakee_1var_paper-005}
+\caption{Histogram plots of residuals for the Lin-Lin and Log-Log models. Female data is omitted for space but looks substantially the same.}
+\label{residualhist}
+\end{center}
+\end{figure}
+\clearpage
+\section*{Conclusion}
+The relationship between life expectancy and economic status is complex, and the exact nature of the causal relationship is controversial. In general, though, it is clear that over the last century in the United States those in the upper end of the income distribution have enjoyed greater increases in life expectancy than their peers in the lower half. I have shown here that a simple Log-Log linear regression model can explain 38\% percent of the variance in male life expectancy at the county average level, and 48\% of the variance in female life expectancy. The relationship suggested by this model is that for males a doubling(or 100\% increase) in income leads to a 5.6\% increase in life expectancy, and for females a doubling in income leads to a 9.4\% increase in life expectancy. The exact nature of the causal link between income and life expectancy is not known, and this analysis will not uncover it; but it does suggest to policymakers that as income inequality increases the disparity in lifespan will increase apace, which has important policy and equality implications. Further work to improve the accuracy of this model will include adding additional regressors such as income in earlier years, as well as data about poverty levels in each county.
 
-Discussion
 
-
+\clearpage
+\bibliographystyle{plain}
+\bibliography{1varpaper}
 
 \end{document}
