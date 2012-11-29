@@ -1,0 +1,46 @@
+\documentclass{beamer}
+% This is the beamer file for presentations given in Stat571A Fall 2012
+% The project is to find predictors for Life Expectancy differences in counties
+% Data are from the US Census Bureau
+\usetheme{Pittsburgh}
+\usecolortheme{beaver}
+%\setbeamertemplate{itemize items}[circle]
+\setbeamertemplate{navigation symbols}{}%remove navigation symbols
+\usepackage{graphicx}
+\title{Linear Regression Model for Income and Life Expectancy}
+\author{Brian Mannakee \\Gutenkunst Group - Molecular and Cellular Biology \\Statistics GIDP}
+\date{\today}
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+<<echo=false,results=hide>>=
+library(xtable)
+source('life_expectancy.R')
+f <- load_le()
+less_data <- subset(f,select=c(fips,Male,Female,income.09,all.ages.pov.percent.09,all.ages.pov.percent.89,Year))
+f09 <- subset(f,Year==2009,select=c(fips,Female,income.09,all.ages.pov.percent.09))
+m09 <- subset(f,Year==2009,select=c(fips,Male,income.09,all.ages.pov.percent.09))
+f09$gender <- 1
+names(f09) <- c('fips','le','income','pov','gender')
+m09$gender <- 0
+names(m09) <- c('fips','le','income','pov','gender')
+c09 <- rbind(m09,f09)
+f89 <- subset(f,Year==1989,select=c(fips,Female,income.09,all.ages.pov.percent.09))
+m89 <- subset(f,Year==1989,select=c(fips,Male,income.09,all.ages.pov.percent.09))
+f89$gender <- 1
+names(f89) <- c('fips','le','income','pov','gender')
+m89$gender <- 0
+names(m89) <- c('fips','le','income','pov','gender')
+c89 <- rbind(m89,f89)
+
+@
+\begin{frame}
+  \titlepage
+\end{frame}
+\begin{frame}[fragile]
+<<echo=true,results=verbatim>>=
+head(c09)
+tail(c09)
+@
+\end{frame}
+
+\end{document}
